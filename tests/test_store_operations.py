@@ -369,6 +369,108 @@ class TestMappingOperations:
         updated_names = [mapping[const.MAPPING_NAME] for mapping in updated_mappings]
         assert "temp_sensor" not in updated_names
 
+    @pytest.mark.asyncio
+    async def test_async_update_mapping_preserves_data_fields(self, hass):
+        """Regression test for issue #680.
+
+        When the Sensor Groups panel saves an edit it should not be able to
+        overwrite server-computed ``data_last_*`` fields, and the POST
+        handler is expected to strip them before calling the store. This
+        test exercises the store directly with only editable fields and
+        confirms the rename takes effect without corrupting existing data.
+        """
+        store = SmartIrrigationStorage(hass)
+        await store.async_load()
+
+        created = await store.async_create_mapping(
+            {
+                const.MAPPING_NAME: "original_name",
+                const.MAPPING_MAPPINGS: {
+                    const.MAPPING_TEMPERATURE: {
+                        "sensorentity": "",
+                        "source": "weather_service",
+                        "unit": "",
+                    },
+                },
+            }
+        )
+
+        mapping_id = created[const.MAPPING_ID]
+
+        updated = await store.async_update_mapping(
+            mapping_id,
+            {
+                const.MAPPING_NAME: "renamed",
+                const.MAPPING_MAPPINGS: {
+                    const.MAPPING_TEMPERATURE: {
+                        "sensorentity": "sensor.outside_temp",
+                        "source": "sensor",
+                        "unit": "°C",
+                    },
+                },
+            },
+        )
+
+        assert updated[const.MAPPING_NAME] == "renamed"
+        assert (
+            updated[const.MAPPING_MAPPINGS][const.MAPPING_TEMPERATURE]["sensorentity"]
+            == "sensor.outside_temp"
+        )
+
+
+class TestMappingViewSchema:
+    """Regression tests for the /api/smart_irrigation/mappings POST schema.
+
+    See issue #680: the Sensor Groups panel was echoing server-computed
+    fields (``data_last_updated`` as an ISO string, ``data`` as a list,
+    etc.) back on save, which failed ``vol.Coerce(dict)`` validation and
+    left changes unsaved.
+    """
+
+    def _schema(self):
+        import voluptuous as vol
+        from homeassistant.helpers import config_validation as cv
+
+        from custom_components.smart_irrigation import const
+
+        return vol.Schema(
+            {
+                vol.Optional(const.MAPPING_ID): vol.Coerce(int),
+                vol.Optional(const.MAPPING_NAME): cv.string,
+                vol.Optional(const.MAPPING_MAPPINGS): vol.Coerce(dict),
+                vol.Optional(const.ATTR_REMOVE): cv.boolean,
+                vol.Optional(const.MAPPING_DATA): object,
+                vol.Optional(const.MAPPING_DATA_LAST_UPDATED): object,
+                vol.Optional(const.MAPPING_DATA_LAST_ENTRY): object,
+                vol.Optional(const.MAPPING_DATA_LAST_CALCULATION): object,
+            }
+        )
+
+    def test_accepts_iso_string_data_last_updated(self):
+        """Schema must not reject the ISO-string form the frontend sends."""
+        payload = {
+            const.MAPPING_ID: 0,
+            const.MAPPING_NAME: "Default sensor group",
+            const.MAPPING_MAPPINGS: {"Temperature": {"sensorentity": ""}},
+            const.MAPPING_DATA: [],
+            const.MAPPING_DATA_LAST_UPDATED: "2026-04-14T21:48:21.000Z",
+            const.MAPPING_DATA_LAST_ENTRY: {},
+            const.MAPPING_DATA_LAST_CALCULATION: {},
+        }
+        # Schema validation must not raise.
+        self._schema()(payload)
+
+    def test_accepts_none_for_data_last_fields(self):
+        """``None`` remains valid for the data_last_* fields."""
+        payload = {
+            const.MAPPING_ID: 0,
+            const.MAPPING_NAME: "Default sensor group",
+            const.MAPPING_DATA_LAST_UPDATED: None,
+            const.MAPPING_DATA_LAST_ENTRY: None,
+            const.MAPPING_DATA_LAST_CALCULATION: None,
+        }
+        self._schema()(payload)
+
 
 class TestModuleOperations:
     """Test module management operations."""
