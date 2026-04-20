@@ -3493,6 +3493,8 @@ class SmartIrrigationCoordinator(DataUpdateCoordinator):
         results = []
 
         for i, day_data in enumerate(forecast_data[:5]):
+            if day_data is None:
+                continue
             date_str = (today + timedelta(days=i + 1)).strftime("%Y-%m-%d")
             day_data_with_multiplier = {**day_data, const.MAPPING_DATA_MULTIPLIER: 1.0}
 
