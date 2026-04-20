@@ -175,6 +175,7 @@ export const fetchWateringCalendar = (
     zone_id: zone_id,
   });
 
+// Backend API for getting the bucket forecast based on weather service data
 export const fetchBucketForecast = (
   hass: HomeAssistant,
   zone_id: string,

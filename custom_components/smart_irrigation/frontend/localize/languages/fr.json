@@ -205,13 +205,13 @@
         "information": "Information",
         "update": "Mise à jour",
         "reset-bucket": "Mise à zéro du seau (bucket)",
-        "view-bucket-forecast": "View bucket forecast"
+        "view-bucket-forecast": "Voir la prévision du seau (bucket)"
       },
       "bucket-forecast": {
-        "title": "5-Day Bucket Forecast",
-        "weather-service-note": "Based on weather service forecast data only — not on the configured sensor group",
-        "no-data": "No forecast data available",
-        "starting-bucket": "Starting bucket"
+        "title": "Prévision du seau (bucket) sur 5 jours",
+        "weather-service-note": "Basé uniquement sur les données de prévision du service météo — pas sur le groupe de capteurs configuré",
+        "no-data": "Aucune donnée de prévision disponible",
+        "starting-bucket": "Seau (bucket) initial"
       },
       "cards": {
         "add-zone": {

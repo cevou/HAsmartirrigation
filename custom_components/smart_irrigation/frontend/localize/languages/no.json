@@ -188,13 +188,13 @@
         "information": "Informasjon",
         "update": "Oppdater",
         "reset-bucket": "Nullstill bøtte",
-        "view-bucket-forecast": "View bucket forecast"
+        "view-bucket-forecast": "Vis bøtteprognose"
       },
       "bucket-forecast": {
-        "title": "5-Day Bucket Forecast",
-        "weather-service-note": "Based on weather service forecast data only — not on the configured sensor group",
-        "no-data": "No forecast data available",
-        "starting-bucket": "Starting bucket"
+        "title": "5-dagers bøtteprognose",
+        "weather-service-note": "Basert kun på prognosedata fra værtjenesten — ikke på den konfigurerte sensorguppen",
+        "no-data": "Ingen prognosedata tilgjengelig",
+        "starting-bucket": "Startbøtte"
       },
       "cards": {
         "add-zone": {

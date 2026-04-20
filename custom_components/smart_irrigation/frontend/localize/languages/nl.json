@@ -203,13 +203,13 @@
         "information": "Informatie",
         "update": "Bijwerken",
         "reset-bucket": "Leeg voorraad",
-        "view-bucket-forecast": "View bucket forecast"
+        "view-bucket-forecast": "Voorraadprognose bekijken"
       },
       "bucket-forecast": {
-        "title": "5-Day Bucket Forecast",
-        "weather-service-note": "Based on weather service forecast data only — not on the configured sensor group",
-        "no-data": "No forecast data available",
-        "starting-bucket": "Starting bucket"
+        "title": "5-daagse voorraadprognose",
+        "weather-service-note": "Alleen gebaseerd op prognosedata van de weerdienst, niet op de geconfigureerde sensorgroep",
+        "no-data": "Geen prognosedata beschikbaar",
+        "starting-bucket": "Startvoorraad"
       },
       "cards": {
         "add-zone": {

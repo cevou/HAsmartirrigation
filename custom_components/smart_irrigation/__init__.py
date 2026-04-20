@@ -3481,7 +3481,13 @@ class SmartIrrigationCoordinator(DataUpdateCoordinator):
             self._WeatherServiceClient.get_forecast_data
         )
 
+        _LOGGER.warning(
+            f"Fetched forecast data for zone {zone_id}: type={type(forecast_data)}, "
+            f"len={len(forecast_data) if forecast_data is not None else 'None'}, content={forecast_data}"
+        )
+
         if not forecast_data:
+            _LOGGER.warning(f"No forecast data available for zone {zone_id}")
             return []
 
         ha_config_is_metric = self.hass.config.units is METRIC_SYSTEM

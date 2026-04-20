@@ -204,13 +204,13 @@
         "information": "Informácia",
         "update": "Aktualizovať",
         "reset-bucket": "Resetovať vedro",
-        "view-bucket-forecast": "View bucket forecast"
+        "view-bucket-forecast": "Zobraziť predpoveď vedra"
       },
       "bucket-forecast": {
-        "title": "5-Day Bucket Forecast",
-        "weather-service-note": "Based on weather service forecast data only — not on the configured sensor group",
-        "no-data": "No forecast data available",
-        "starting-bucket": "Starting bucket"
+        "title": "5-dňová predpoveď vedra",
+        "weather-service-note": "Založené iba na údajoch predpovede zo služby počasia, nie na nakonfigurovanej skupine senzorov",
+        "no-data": "Nie sú k dispozícii žiadne údaje predpovede",
+        "starting-bucket": "Počiatočné vedro"
       },
       "cards": {
         "add-zone": {
