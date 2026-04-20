@@ -269,7 +269,14 @@
         "view-weather-info": "Visualizza le informazioni meteo",
         "view-weather-info-message": "Informazioni meteo disponibili per",
         "view-weather-info-todo": "TODO: Implementare la navigazione ai dettagli del gruppo di sensori",
-        "view-watering-calendar": "Visualizza il calendario delle irrigazioni"
+        "view-watering-calendar": "Visualizza il calendario delle irrigazioni",
+        "view-bucket-forecast": "Visualizza previsione secchio"
+      },
+      "bucket-forecast": {
+        "title": "Previsione secchio 5 giorni",
+        "weather-service-note": "Basato solo sui dati previsionali del servizio meteo — non sul gruppo di sensori configurato",
+        "no-data": "Nessun dato di previsione disponibile",
+        "starting-bucket": "Secchio iniziale"
       },
       "cards": {
         "add-zone": {

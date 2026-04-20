@@ -3372,6 +3372,139 @@ class SmartIrrigationCoordinator(DataUpdateCoordinator):
             _LOGGER.error("Failed to get IU schedule status: %s", e)
             raise
 
+    def _calculate_forecast_day(self, zone, modinst, module_name, weatherdata, bucket_start):
+        """Calculate bucket forecast for a single day without modifying zone state.
+
+        Args:
+            zone: Zone dict with configuration.
+            modinst: Already-instantiated module instance.
+            module_name: String name of the module ("PyETO", "Static", "Passthrough").
+            weatherdata: Dict of weather values for the day.
+            bucket_start: Starting bucket value in mm for this day.
+
+        Returns:
+            dict with keys: date (caller sets), precipitation, et, drainage, delta, bucket_eod.
+        """
+        from homeassistant.util.unit_system import METRIC_SYSTEM
+
+        maximum_bucket = zone.get(const.ZONE_MAXIMUM_BUCKET)
+        ha_config_is_metric = self.hass.config.units is METRIC_SYSTEM
+
+        # Convert maximum_bucket to mm if HA is imperial
+        if not ha_config_is_metric and maximum_bucket is not None:
+            maximum_bucket = convert_between(const.UNIT_INCH, const.UNIT_MM, maximum_bucket)
+
+        # Get drainage_rate in mm/hour
+        drainage_rate = zone.get(const.ZONE_DRAINAGE_RATE, 0.0) or 0.0
+        if not ha_config_is_metric:
+            drainage_rate = convert_between(const.UNIT_INCH, const.UNIT_MM, drainage_rate)
+
+        # Compute ET and precipitation based on module type
+        hour_multiplier = weatherdata.get(const.MAPPING_DATA_MULTIPLIER, 1.0)
+        if module_name == "PyETO":
+            module_delta = modinst.calculate(weather_data=weatherdata, forecast_data=None)
+            precipitation = weatherdata.get(const.MAPPING_PRECIPITATION, 0.0) or 0.0
+        elif module_name == "Static":
+            module_delta = modinst.calculate()
+            precipitation = 0.0
+        elif module_name == "Passthrough":
+            et_val = weatherdata.get(const.MAPPING_EVAPOTRANSPIRATION, 0.0) or 0.0
+            module_delta = 0 - modinst.calculate(et_data=et_val)
+            precipitation = 0.0
+        else:
+            module_delta = 0.0
+            precipitation = 0.0
+
+        # et is the positive evapotranspiration demand (module_delta is negative for drying)
+        et = -(module_delta * hour_multiplier)
+
+        # Apply delta to bucket, cap at maximum
+        bucket_after_delta = bucket_start + (module_delta * hour_multiplier) + precipitation
+        if maximum_bucket is not None and bucket_after_delta > maximum_bucket:
+            bucket_after_delta = float(maximum_bucket)
+
+        # Drainage: only when bucket is above 0, scales with (bucket/max)^4
+        drainage_per_day = drainage_rate * 24
+        drainage = 0.0
+        if bucket_after_delta > 0 and drainage_rate > 0:
+            if maximum_bucket and maximum_bucket > 0:
+                gamma = 2
+                drainage = drainage_per_day * (bucket_after_delta / maximum_bucket) ** ((2 + 3 * gamma) / gamma)
+            else:
+                drainage = drainage_per_day
+
+        # No lower bound — allow negative (signals irrigation is needed)
+        bucket_eod = bucket_after_delta - drainage
+        delta = bucket_eod - bucket_start
+
+        return {
+            "precipitation": round(precipitation, 2),
+            "et": round(et, 2),
+            "drainage": round(drainage, 2),
+            "delta": round(delta, 2),
+            "bucket_eod": round(bucket_eod, 2),
+        }
+
+    async def async_generate_bucket_forecast(self, zone_id: int):
+        """Generate a 5-day bucket forecast for a zone using weather service forecast data.
+
+        Args:
+            zone_id: The ID of the zone to forecast.
+
+        Returns:
+            list: Up to 5 daily forecast dicts, each with keys:
+                  date, precipitation, et, drainage, delta, bucket_eod.
+        """
+        from datetime import datetime, timedelta
+        from homeassistant.util.unit_system import METRIC_SYSTEM
+
+        zone = self.store.get_zone(zone_id)
+        if not zone:
+            raise SmartIrrigationError(f"Zone {zone_id} not found")
+
+        if not self._WeatherServiceClient:
+            raise SmartIrrigationError(
+                "No weather service configured — bucket forecast requires a weather service"
+            )
+
+        module_id = zone.get(const.ZONE_MODULE)
+        modinst = await self.getModuleInstanceByID(module_id)
+        if not modinst:
+            raise SmartIrrigationError(
+                f"Cannot load calculation module for zone {zone_id}"
+            )
+
+        m = self.store.get_module(module_id)
+        module_name = m.get(const.MODULE_NAME) if m else "Unknown"
+
+        forecast_data = await self.hass.async_add_executor_job(
+            self._WeatherServiceClient.get_forecast_data
+        )
+
+        if not forecast_data:
+            return []
+
+        ha_config_is_metric = self.hass.config.units is METRIC_SYSTEM
+        bucket_start = zone.get(const.ZONE_BUCKET, 0.0)
+        if not ha_config_is_metric:
+            bucket_start = convert_between(const.UNIT_INCH, const.UNIT_MM, bucket_start)
+
+        today = datetime.now().date()
+        results = []
+
+        for i, day_data in enumerate(forecast_data[:5]):
+            date_str = (today + timedelta(days=i + 1)).strftime("%Y-%m-%d")
+            day_data_with_multiplier = {**day_data, const.MAPPING_DATA_MULTIPLIER: 1.0}
+
+            day_result = self._calculate_forecast_day(
+                zone, modinst, module_name, day_data_with_multiplier, bucket_start
+            )
+            day_result["date"] = date_str
+            results.append(day_result)
+            bucket_start = day_result["bucket_eod"]
+
+        return results
+
     async def async_generate_watering_calendar(self, zone_id: int | None = None):
         """Generate a 12-month watering calendar for a zone or all zones.
 

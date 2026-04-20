@@ -189,3 +189,12 @@ export interface WeatherRecord {
   wind_speed?: number;
   retrieval_time?: Date;
 }
+
+export interface BucketForecastDay {
+  date: string;
+  precipitation: number;
+  et: number;
+  drainage: number;
+  delta: number;
+  bucket_eod: number;
+}

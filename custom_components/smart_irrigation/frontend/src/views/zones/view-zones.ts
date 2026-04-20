@@ -13,6 +13,7 @@ import {
   mdiPailRemove,
   mdiCloudOutline,
   mdiCalendar,
+  mdiChartLine,
 } from "@mdi/js";
 import {
   deleteZone,
@@ -29,6 +30,7 @@ import {
   clearAllWeatherdata,
   fetchWateringCalendar,
   fetchMappingWeatherRecords,
+  fetchBucketForecast,
 } from "../../data/websockets";
 import { SubscribeMixin } from "../../subscribe-mixin";
 
@@ -39,6 +41,7 @@ import {
   SmartIrrigationModule,
   SmartIrrigationMapping,
   WeatherRecord,
+  BucketForecastDay,
 } from "../../types";
 import { output_unit } from "../../helpers";
 import { globalStyle } from "../../styles/global-style";
@@ -76,6 +79,9 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
 
   @property({ type: Map })
   private wateringCalendars = new Map<number, any>();
+
+  @property({ type: Map })
+  private bucketForecasts = new Map<number, BucketForecastDay[]>();
 
   @property({ type: Map })
   private weatherRecords = new Map<number, WeatherRecord[]>();
@@ -454,6 +460,42 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
     }
   }
 
+  private async handleViewBucketForecast(index: number): Promise<void> {
+    const zone = this.zones[index];
+    if (!zone || zone.id == undefined) {
+      return;
+    }
+
+    const selector = `#forecast-section-${zone.id}`;
+    const forecastSection = this.shadowRoot?.querySelector(selector);
+
+    if (forecastSection) {
+      if (forecastSection.hasAttribute("hidden")) {
+        // Fetch on first open only
+        if (!this.bucketForecasts.has(zone.id)) {
+          try {
+            const forecast = await fetchBucketForecast(
+              this.hass!,
+              zone.id.toString(),
+            );
+            this.bucketForecasts.set(zone.id, forecast);
+            this._scheduleUpdate();
+          } catch (error) {
+            console.error(
+              `Failed to fetch bucket forecast for zone ${zone.id}:`,
+              error,
+            );
+            this.bucketForecasts.set(zone.id, []);
+            this._scheduleUpdate();
+          }
+        }
+        forecastSection.removeAttribute("hidden");
+      } else {
+        forecastSection.setAttribute("hidden", "");
+      }
+    }
+  }
+
   private async _fetchWeatherRecords(): Promise<void> {
     if (!this.hass) {
       return;
@@ -667,6 +709,79 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
     </div>`;
   }
 
+  private renderBucketForecast(zone: SmartIrrigationZone): TemplateResult {
+    if (!this.hass || typeof zone.id !== "number") {
+      return html``;
+    }
+
+    const forecastDays = this.bucketForecasts.get(zone.id) || [];
+
+    return html`
+      <div class="bucket-forecast">
+        <h4>
+          ${localize(
+            "panels.zones.bucket-forecast.title",
+            this.hass.language,
+          )}
+        </h4>
+        <div class="forecast-note">
+          ${localize(
+            "panels.zones.bucket-forecast.weather-service-note",
+            this.hass.language,
+          )}
+        </div>
+        ${forecastDays.length === 0
+          ? html`
+              <div class="forecast-empty">
+                ${localize(
+                  "panels.zones.bucket-forecast.no-data",
+                  this.hass.language,
+                )}
+              </div>
+            `
+          : html`
+              <div class="forecast-table">
+                <div class="forecast-header">
+                  <span>Date</span>
+                  <span>Precipitation (mm)</span>
+                  <span>ET (mm)</span>
+                  <span>Drainage (mm)</span>
+                  <span>Delta (mm)</span>
+                  <span>Bucket EOD (mm)</span>
+                </div>
+                ${forecastDays.map(
+                  (day) => html`
+                    <div class="forecast-row">
+                      <span>${day.date}</span>
+                      <span>${day.precipitation.toFixed(1)}</span>
+                      <span>${day.et.toFixed(1)}</span>
+                      <span>${day.drainage.toFixed(1)}</span>
+                      <span
+                        style="color: ${day.delta >= 0 ? "#2e7d32" : "#c62828"}"
+                        >${day.delta >= 0 ? "+" : ""}${day.delta.toFixed(1)}</span
+                      >
+                      <span
+                        style="color: ${day.bucket_eod < 0 ? "#c62828" : "inherit"}"
+                        >${day.bucket_eod.toFixed(1)}</span
+                      >
+                    </div>
+                  `,
+                )}
+              </div>
+              <div class="forecast-info">
+                ${localize(
+                  "panels.zones.bucket-forecast.starting-bucket",
+                  this.hass.language,
+                )}:
+                ${Number(zone.bucket).toFixed(1)} mm |
+                Max: ${Number(zone.maximum_bucket).toFixed(1)} mm |
+                Drainage rate: ${Number(zone.drainage_rate).toFixed(2)} mm/h
+              </div>
+            `}
+      </div>
+    `;
+  }
+
   private async saveToHA(zone: SmartIrrigationZone): Promise<void> {
     if (!this.hass) {
       throw new Error("Home Assistant connection not available");
@@ -820,6 +935,27 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
           <path fill="#404040" d="${mdiCalendar}" />
         </svg>
       </div>`;
+
+      let forecast_button_to_show;
+      if (
+        this.config?.use_weather_service === true &&
+        zone.module !== undefined
+      ) {
+        forecast_button_to_show = html` <div
+          class="action-button-right"
+          @click="${() => this.handleViewBucketForecast(index)}"
+        >
+          <span class="action-button-label">
+            ${localize(
+              "panels.zones.actions.view-bucket-forecast",
+              this.hass.language,
+            )}
+          </span>
+          <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+            <path fill="#404040" d="${mdiChartLine}" />
+          </svg>
+        </div>`;
+      }
 
       const information_button_to_show =
         zone.explanation != null && zone.explanation.length > 0
@@ -1195,6 +1331,7 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
                 ${reset_bucket_button_to_show}
                 ${weather_info_button_to_show}
                 ${calendar_button_to_show}
+                ${forecast_button_to_show}
                 ${delete_button_to_show}
               </div>
             </div>
@@ -1207,6 +1344,9 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
             </div>
             <div id="calendar-section-${zone.id}" hidden>
               ${this.renderWateringCalendar(zone)}
+            </div>
+            <div id="forecast-section-${zone.id}" hidden>
+              ${this.renderBucketForecast(zone)}
             </div>
             <div id="weather-section-${zone.id}" hidden>
               ${this.renderWeatherRecords(zone)}
@@ -1399,6 +1539,52 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
   static get styles(): CSSResultGroup {
     return css`
       ${globalStyle}/* View-specific styles only - most common styles are now in globalStyle */
+      .bucket-forecast {
+        margin-top: 8px;
+      }
+      .forecast-note {
+        font-size: 12px;
+        color: #e65100;
+        background: #fff3e0;
+        padding: 6px 8px;
+        border-radius: 4px;
+        border-left: 3px solid #ff9800;
+        margin-bottom: 8px;
+      }
+      .forecast-table {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        font-size: 13px;
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .forecast-header {
+        display: contents;
+      }
+      .forecast-header span {
+        background: var(--primary-color-light, #e3f2fd);
+        padding: 6px 8px;
+        font-weight: bold;
+        border-bottom: 1px solid var(--divider-color, #e0e0e0);
+      }
+      .forecast-row {
+        display: contents;
+      }
+      .forecast-row span {
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--secondary-background-color, #f0f0f0);
+      }
+      .forecast-info {
+        font-size: 11px;
+        color: var(--secondary-text-color, #757575);
+        margin-top: 6px;
+      }
+      .forecast-empty {
+        font-size: 13px;
+        color: var(--secondary-text-color, #757575);
+        padding: 8px 0;
+      }
     `;
   }
 }

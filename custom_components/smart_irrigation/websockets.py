@@ -562,6 +562,27 @@ async def websocket_get_watering_calendar(hass: HomeAssistant, connection, msg):
         connection.send_error(msg["id"], "calendar_generation_failed", str(e))
 
 
+@async_response
+async def websocket_get_bucket_forecast(hass: HomeAssistant, connection, msg):
+    """Get 5-day bucket forecast for a zone using weather service forecast data."""
+    coordinator = hass.data[const.DOMAIN]["coordinator"]
+    zone_id = msg.get("zone_id")
+
+    _LOGGER.debug("websocket_get_bucket_forecast called for zone %s", zone_id)
+    try:
+        if zone_id is not None:
+            zone_id = int(zone_id)
+
+        forecast = await coordinator.async_generate_bucket_forecast(zone_id)
+        connection.send_result(msg["id"], forecast)
+
+    except Exception as e:
+        _LOGGER.error(
+            "Error generating bucket forecast for zone %s: %s", zone_id, e
+        )
+        connection.send_error(msg["id"], "bucket_forecast_failed", str(e))
+
+
 class SmartIrrigationWateringCalendarView(HomeAssistantView):
     """View to handle watering calendar requests via HTTP API."""
 
@@ -672,6 +693,17 @@ async def async_register_websockets(hass: HomeAssistant):
             {
                 vol.Required("type"): const.DOMAIN + "/watering_calendar",
                 vol.Optional("zone_id"): vol.Coerce(str),
+            }
+        ),
+    )
+    async_register_command(
+        hass,
+        const.DOMAIN + "/bucket_forecast",
+        websocket_get_bucket_forecast,
+        websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
+            {
+                vol.Required("type"): const.DOMAIN + "/bucket_forecast",
+                vol.Required("zone_id"): vol.Coerce(str),
             }
         ),
     )

@@ -4,6 +4,7 @@ import {
   SmartIrrigationZone,
   SmartIrrigationModule,
   SmartIrrigationMapping,
+  BucketForecastDay,
 } from "../types";
 import { DOMAIN } from "../const";
 
@@ -171,5 +172,14 @@ export const fetchWateringCalendar = (
 ): Promise<any[]> =>
   hass.callWS({
     type: DOMAIN + "/watering_calendar",
+    zone_id: zone_id,
+  });
+
+export const fetchBucketForecast = (
+  hass: HomeAssistant,
+  zone_id: string,
+): Promise<BucketForecastDay[]> =>
+  hass.callWS({
+    type: DOMAIN + "/bucket_forecast",
     zone_id: zone_id,
   });

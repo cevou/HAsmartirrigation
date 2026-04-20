@@ -187,7 +187,14 @@
         "calculate": "Beregn",
         "information": "Informasjon",
         "update": "Oppdater",
-        "reset-bucket": "Nullstill bøtte"
+        "reset-bucket": "Nullstill bøtte",
+        "view-bucket-forecast": "View bucket forecast"
+      },
+      "bucket-forecast": {
+        "title": "5-Day Bucket Forecast",
+        "weather-service-note": "Based on weather service forecast data only — not on the configured sensor group",
+        "no-data": "No forecast data available",
+        "starting-bucket": "Starting bucket"
       },
       "cards": {
         "add-zone": {

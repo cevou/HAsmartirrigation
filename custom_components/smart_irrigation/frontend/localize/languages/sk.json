@@ -203,7 +203,14 @@
         "calculate": "Vypočítať",
         "information": "Informácia",
         "update": "Aktualizovať",
-        "reset-bucket": "Resetovať vedro"
+        "reset-bucket": "Resetovať vedro",
+        "view-bucket-forecast": "View bucket forecast"
+      },
+      "bucket-forecast": {
+        "title": "5-Day Bucket Forecast",
+        "weather-service-note": "Based on weather service forecast data only — not on the configured sensor group",
+        "no-data": "No forecast data available",
+        "starting-bucket": "Starting bucket"
       },
       "cards": {
         "add-zone": {

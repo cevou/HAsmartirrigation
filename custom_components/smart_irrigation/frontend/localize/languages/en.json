@@ -293,7 +293,14 @@
         "reset-bucket": "Reset bucket",
         "view-weather-info": "View weather data",
         "view-weather-info-message": "Weather data available for",
-        "view-watering-calendar": "View watering calendar"
+        "view-watering-calendar": "View watering calendar",
+        "view-bucket-forecast": "View bucket forecast"
+      },
+      "bucket-forecast": {
+        "title": "5-Day Bucket Forecast",
+        "weather-service-note": "Based on weather service forecast data only — not on the configured sensor group",
+        "no-data": "No forecast data available",
+        "starting-bucket": "Starting bucket"
       },
       "cards": {
         "add-zone": {
