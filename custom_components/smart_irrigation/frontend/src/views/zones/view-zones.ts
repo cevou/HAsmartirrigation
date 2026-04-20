@@ -773,9 +773,9 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
                   "panels.zones.bucket-forecast.starting-bucket",
                   this.hass.language,
                 )}:
-                ${Number(zone.bucket).toFixed(1)} mm |
-                Max: ${Number(zone.maximum_bucket).toFixed(1)} mm |
-                Drainage rate: ${Number(zone.drainage_rate).toFixed(2)} mm/h
+                ${Number(zone.bucket).toFixed(1)} ${output_unit(this.config, ZONE_BUCKET)} |
+                Max: ${Number(zone.maximum_bucket).toFixed(1)} ${output_unit(this.config, ZONE_MAXIMUM_BUCKET)} |
+                Drainage rate: ${Number(zone.drainage_rate).toFixed(2)} ${output_unit(this.config, ZONE_DRAINAGE_RATE)}/h
               </div>
             `}
       </div>
