@@ -1239,7 +1239,7 @@
           "view-bucket-forecast": "Vorratsprognose anzeigen"
         },
         "bucket-forecast": {
-          title: "5-Tage-Vorratsprognose",
+          title: "Vorratsprognose",
           "weather-service-note": "Basiert nur auf Wetterdienst-Prognosedaten, nicht auf der konfigurierten Sensorgruppe",
           "no-data": "Keine Prognosedaten verfügbar",
           "starting-bucket": "Startvorrat"
@@ -1972,7 +1972,7 @@
           "view-bucket-forecast": "Ver pronóstico del cubo"
         },
         "bucket-forecast": {
-          title: "Pronóstico del cubo de 5 días",
+          title: "Pronóstico del cubo",
           "weather-service-note": "Basado solo en datos de pronóstico del servicio meteorológico, no en el grupo de sensores configurado",
           "no-data": "No hay datos de pronóstico disponibles",
           "starting-bucket": "Cubo inicial"
@@ -2264,7 +2264,7 @@
           "view-bucket-forecast": "Voir la prévision du seau (bucket)"
         },
         "bucket-forecast": {
-          title: "Prévision du seau (bucket) sur 5 jours",
+          title: "Prévision du seau (bucket)",
           "weather-service-note": "Basé uniquement sur les données de prévision du service météo — pas sur le groupe de capteurs configuré",
           "no-data": "Aucune donnée de prévision disponible",
           "starting-bucket": "Seau (bucket) initial"
@@ -2625,7 +2625,7 @@
           "view-bucket-forecast": "Visualizza previsione secchio"
         },
         "bucket-forecast": {
-          title: "Previsione secchio 5 giorni",
+          title: "Previsione secchio",
           "weather-service-note": "Basato solo sui dati previsionali del servizio meteo — non sul gruppo di sensori configurato",
           "no-data": "Nessun dato di previsione disponibile",
           "starting-bucket": "Secchio iniziale"
@@ -2920,7 +2920,7 @@
           "view-bucket-forecast": "Voorraadprognose bekijken"
         },
         "bucket-forecast": {
-          title: "5-daagse voorraadprognose",
+          title: "Voorraadprognose",
           "weather-service-note": "Alleen gebaseerd op prognosedata van de weerdienst, niet op de geconfigureerde sensorgroep",
           "no-data": "Geen prognosedata beschikbaar",
           "starting-bucket": "Startvoorraad"
@@ -3199,7 +3199,7 @@
           "view-bucket-forecast": "Vis bøtteprognose"
         },
         "bucket-forecast": {
-          title: "5-dagers bøtteprognose",
+          title: "Bøtteprognose",
           "weather-service-note": "Basert kun på prognosedata fra værtjenesten — ikke på den konfigurerte sensorguppen",
           "no-data": "Ingen prognosedata tilgjengelig",
           "starting-bucket": "Startbøtte"
@@ -3488,7 +3488,7 @@
           "view-bucket-forecast": "Zobraziť predpoveď vedra"
         },
         "bucket-forecast": {
-          title: "5-dňová predpoveď vedra",
+          title: "Predpoveď vedra",
           "weather-service-note": "Založené iba na údajoch predpovede zo služby počasia, nie na nakonfigurovanej skupine senzorov",
           "no-data": "Nie sú k dispozícii žiadne údaje predpovede",
           "starting-bucket": "Počiatočné vedro"
@@ -5433,7 +5433,8 @@
   }
 
   .calendar-table,
-  .weather-table {
+  .weather-table,
+  .forecast-table {
     display: grid;
     gap: 8px;
     font-size: 0.85em;
@@ -5447,30 +5448,46 @@
     grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 1fr;
   }
 
+  .forecast-table {
+    grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr;
+  }
+
   .calendar-header,
-  .weather-header {
+  .weather-header,
+  .forecast-header {
     display: contents;
     font-weight: 500;
     color: var(--primary-text-color);
   }
 
   .calendar-header span,
-  .weather-header span {
+  .weather-header span,
+  .forecast-header span {
     padding: 4px;
     background: var(--card-background-color);
     border-bottom: 2px solid var(--primary-color);
   }
 
   .calendar-row,
-  .weather-row {
+  .weather-row,
+  .forecast-row {
     display: contents;
     color: var(--secondary-text-color);
   }
 
   .calendar-row span,
-  .weather-row span {
+  .weather-row span,
+  .forecast-row span {
     padding: 4px;
     border-bottom: 1px solid var(--divider-color);
+  }
+
+  .value-positive {
+    color: var(--success-color, #2e7d32);
+  }
+
+  .value-negative {
+    color: var(--error-color, #c62828);
   }
 
   .calendar-info {
@@ -9338,12 +9355,10 @@
                       <span>${e.precipitation.toFixed(1)}</span>
                       <span>${e.et.toFixed(1)}</span>
                       <span>${e.drainage.toFixed(1)}</span>
-                      <span
-                        style="color: ${e.delta >= 0 ? "#2e7d32" : "#c62828"}"
+                      <span class="${e.delta >= 0 ? "value-positive" : "value-negative"}"
                         >${e.delta >= 0 ? "+" : ""}${e.delta.toFixed(1)}</span
                       >
-                      <span
-                        style="color: ${e.bucket_eod < 0 ? "#c62828" : "inherit"}"
+                      <span class="${e.bucket_eod < 0 ? "value-negative" : ""}"
                         >${e.bucket_eod.toFixed(1)}</span
                       >
                     </div>
@@ -9353,7 +9368,7 @@
                 ${Dn("panels.zones.bucket-forecast.starting-bucket", this.hass.language)}:
                 ${Number(e.bucket).toFixed(1)} ${$t(this.config, ut)} |
                 Max: ${Number(e.maximum_bucket).toFixed(1)} ${$t(this.config, mt)} |
-                Drainage rate: ${Number(e.drainage_rate).toFixed(2)} ${$t(this.config, ft)}/h
+                ${Dn("panels.zones.labels.drainage_rate", this.hass.language)}: ${Number(e.drainage_rate).toFixed(2)} ${$t(this.config, ft)}
               </div>
             `}
       </div>
@@ -9851,47 +9866,26 @@
         margin-top: 8px;
       }
       .forecast-note {
-        font-size: 12px;
-        color: #e65100;
-        background: #fff3e0;
-        padding: 6px 8px;
+        font-size: 0.8em;
+        color: var(--warning-color, #e65100);
+        background: var(--warning-background-color, #fff3e0);
+        padding: 4px 8px;
         border-radius: 4px;
-        border-left: 3px solid #ff9800;
+        border-left: 3px solid var(--warning-color, #ff9800);
         margin-bottom: 8px;
       }
-      .forecast-table {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        font-size: 13px;
-        border: 1px solid var(--divider-color, #e0e0e0);
-        border-radius: 4px;
-        overflow: hidden;
-      }
-      .forecast-header {
-        display: contents;
-      }
-      .forecast-header span {
-        background: var(--primary-color-light, #e3f2fd);
-        padding: 6px 8px;
-        font-weight: bold;
-        border-bottom: 1px solid var(--divider-color, #e0e0e0);
-      }
-      .forecast-row {
-        display: contents;
-      }
-      .forecast-row span {
-        padding: 6px 8px;
-        border-bottom: 1px solid var(--secondary-background-color, #f0f0f0);
-      }
       .forecast-info {
-        font-size: 11px;
-        color: var(--secondary-text-color, #757575);
-        margin-top: 6px;
+        margin-top: 8px;
+        padding: 4px 8px;
+        background: var(--info-color, var(--primary-color));
+        color: white;
+        border-radius: 4px;
+        font-size: 0.8em;
       }
       .forecast-empty {
-        font-size: 13px;
-        color: var(--secondary-text-color, #757575);
-        padding: 8px 0;
+        color: var(--secondary-text-color);
+        padding: 4px 0;
+        font-size: 0.85em;
       }
     `;
     }
