@@ -756,12 +756,10 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
                       <span>${day.precipitation.toFixed(1)}</span>
                       <span>${day.et.toFixed(1)}</span>
                       <span>${day.drainage.toFixed(1)}</span>
-                      <span
-                        style="color: ${day.delta >= 0 ? "#2e7d32" : "#c62828"}"
+                      <span class="${day.delta >= 0 ? "value-positive" : "value-negative"}"
                         >${day.delta >= 0 ? "+" : ""}${day.delta.toFixed(1)}</span
                       >
-                      <span
-                        style="color: ${day.bucket_eod < 0 ? "#c62828" : "inherit"}"
+                      <span class="${day.bucket_eod < 0 ? "value-negative" : ""}"
                         >${day.bucket_eod.toFixed(1)}</span
                       >
                     </div>
@@ -1543,47 +1541,26 @@ class SmartIrrigationViewZones extends SubscribeMixin(LitElement) {
         margin-top: 8px;
       }
       .forecast-note {
-        font-size: 12px;
-        color: #e65100;
-        background: #fff3e0;
-        padding: 6px 8px;
+        font-size: 0.8em;
+        color: var(--warning-color, #e65100);
+        background: var(--warning-background-color, #fff3e0);
+        padding: 4px 8px;
         border-radius: 4px;
-        border-left: 3px solid #ff9800;
+        border-left: 3px solid var(--warning-color, #ff9800);
         margin-bottom: 8px;
       }
-      .forecast-table {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        font-size: 13px;
-        border: 1px solid var(--divider-color, #e0e0e0);
-        border-radius: 4px;
-        overflow: hidden;
-      }
-      .forecast-header {
-        display: contents;
-      }
-      .forecast-header span {
-        background: var(--primary-color-light, #e3f2fd);
-        padding: 6px 8px;
-        font-weight: bold;
-        border-bottom: 1px solid var(--divider-color, #e0e0e0);
-      }
-      .forecast-row {
-        display: contents;
-      }
-      .forecast-row span {
-        padding: 6px 8px;
-        border-bottom: 1px solid var(--secondary-background-color, #f0f0f0);
-      }
       .forecast-info {
-        font-size: 11px;
-        color: var(--secondary-text-color, #757575);
-        margin-top: 6px;
+        margin-top: 8px;
+        padding: 4px 8px;
+        background: var(--info-color, var(--primary-color));
+        color: white;
+        border-radius: 4px;
+        font-size: 0.8em;
       }
       .forecast-empty {
-        font-size: 13px;
-        color: var(--secondary-text-color, #757575);
-        padding: 8px 0;
+        color: var(--secondary-text-color);
+        padding: 4px 0;
+        font-size: 0.85em;
       }
     `;
   }

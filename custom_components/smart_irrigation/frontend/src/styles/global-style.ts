@@ -328,7 +328,8 @@ export const globalStyle = css`
   }
 
   .calendar-table,
-  .weather-table {
+  .weather-table,
+  .forecast-table {
     display: grid;
     gap: 8px;
     font-size: 0.85em;
@@ -342,30 +343,46 @@ export const globalStyle = css`
     grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 1fr;
   }
 
+  .forecast-table {
+    grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr;
+  }
+
   .calendar-header,
-  .weather-header {
+  .weather-header,
+  .forecast-header {
     display: contents;
     font-weight: 500;
     color: var(--primary-text-color);
   }
 
   .calendar-header span,
-  .weather-header span {
+  .weather-header span,
+  .forecast-header span {
     padding: 4px;
     background: var(--card-background-color);
     border-bottom: 2px solid var(--primary-color);
   }
 
   .calendar-row,
-  .weather-row {
+  .weather-row,
+  .forecast-row {
     display: contents;
     color: var(--secondary-text-color);
   }
 
   .calendar-row span,
-  .weather-row span {
+  .weather-row span,
+  .forecast-row span {
     padding: 4px;
     border-bottom: 1px solid var(--divider-color);
+  }
+
+  .value-positive {
+    color: var(--success-color, #2e7d32);
+  }
+
+  .value-negative {
+    color: var(--error-color, #c62828);
   }
 
   .calendar-info {
