@@ -9163,21 +9163,18 @@
     async handleViewBucketForecast(e) {
       var t;
       const a = this.zones[e];
-      if (console.log(`handleViewBucketForecast called for index ${e}, zone:`, a), !a || null == a.id) return void console.log("No zone or zone.id undefined, returning");
+      if (!a || null == a.id) return;
       const i = `#forecast-section-${a.id}`,
         n = null === (t = this.shadowRoot) || void 0 === t ? void 0 : t.querySelector(i);
       if (n) if (n.hasAttribute("hidden")) {
-        if (!this.bucketForecasts.has(a.id)) {
-          console.log(`Fetching bucket forecast for zone ${a.id}`);
-          try {
-            const e = await (s = this.hass, r = a.id.toString(), s.callWS({
-              type: Se + "/bucket_forecast",
-              zone_id: r
-            }));
-            console.log(`Received forecast for zone ${a.id}:`, e), this.bucketForecasts.set(a.id, e), this._scheduleUpdate();
-          } catch (e) {
-            console.error(`Failed to fetch bucket forecast for zone ${a.id}:`, e), this.bucketForecasts.set(a.id, []), this._scheduleUpdate();
-          }
+        if (!this.bucketForecasts.has(a.id)) try {
+          const e = await (s = this.hass, r = a.id.toString(), s.callWS({
+            type: Se + "/bucket_forecast",
+            zone_id: r
+          }));
+          this.bucketForecasts.set(a.id, e), this._scheduleUpdate();
+        } catch (e) {
+          console.error(`Failed to fetch bucket forecast for zone ${a.id}:`, e), this.bucketForecasts.set(a.id, []), this._scheduleUpdate();
         }
         n.removeAttribute("hidden");
       } else n.setAttribute("hidden", "");
