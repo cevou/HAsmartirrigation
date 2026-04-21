@@ -3372,7 +3372,7 @@ class SmartIrrigationCoordinator(DataUpdateCoordinator):
             _LOGGER.error("Failed to get IU schedule status: %s", e)
             raise
 
-    def _calculate_forecast_day(self, zone, modinst, module_name, weatherdata, bucket_start):
+    def _calculate_forecast_day(self, zone, modinst, module_name, weatherdata, bucket_start, remaining_forecast=None):
         """Calculate bucket forecast for a single day without modifying zone state.
 
         Args:
@@ -3381,6 +3381,7 @@ class SmartIrrigationCoordinator(DataUpdateCoordinator):
             module_name: String name of the module ("PyETO", "Static", "Passthrough").
             weatherdata: Dict of weather values for the day.
             bucket_start: Starting bucket value in mm for this day.
+            remaining_forecast: Forecast days after this day, passed to PyETO for its averaging.
 
         Returns:
             dict with keys: date (caller sets), precipitation, et, drainage, delta, bucket_eod.
@@ -3402,7 +3403,7 @@ class SmartIrrigationCoordinator(DataUpdateCoordinator):
         # Compute ET and precipitation based on module type
         hour_multiplier = weatherdata.get(const.MAPPING_DATA_MULTIPLIER, 1.0)
         if module_name == "PyETO":
-            module_delta = modinst.calculate(weather_data=weatherdata, forecast_data=None)
+            module_delta = modinst.calculate(weather_data=weatherdata, forecast_data=remaining_forecast or [])
             precipitation = weatherdata.get(const.MAPPING_PRECIPITATION, 0.0) or 0.0
         elif module_name == "Static":
             module_delta = modinst.calculate()
@@ -3498,14 +3499,15 @@ class SmartIrrigationCoordinator(DataUpdateCoordinator):
         today = datetime.now().date()
         results = []
 
-        for i, day_data in enumerate(forecast_data[:5]):
+        for i, day_data in enumerate(forecast_data):
             if day_data is None:
                 continue
             date_str = (today + timedelta(days=i + 1)).strftime("%Y-%m-%d")
             day_data_with_multiplier = {**day_data, const.MAPPING_DATA_MULTIPLIER: 1.0}
 
             day_result = self._calculate_forecast_day(
-                zone, modinst, module_name, day_data_with_multiplier, bucket_start
+                zone, modinst, module_name, day_data_with_multiplier, bucket_start,
+                remaining_forecast=forecast_data[i + 1:]
             )
             day_result["date"] = date_str
             results.append(day_result)
