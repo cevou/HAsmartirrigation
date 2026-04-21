@@ -191,7 +191,7 @@
         "view-bucket-forecast": "Ver pronóstico del cubo"
       },
       "bucket-forecast": {
-        "title": "Pronóstico del cubo de 5 días",
+        "title": "Pronóstico del cubo",
         "weather-service-note": "Basado solo en datos de pronóstico del servicio meteorológico, no en el grupo de sensores configurado",
         "no-data": "No hay datos de pronóstico disponibles",
         "starting-bucket": "Cubo inicial"

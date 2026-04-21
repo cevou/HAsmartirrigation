@@ -273,7 +273,7 @@
         "view-bucket-forecast": "Visualizza previsione secchio"
       },
       "bucket-forecast": {
-        "title": "Previsione secchio 5 giorni",
+        "title": "Previsione secchio",
         "weather-service-note": "Basato solo sui dati previsionali del servizio meteo — non sul gruppo di sensori configurato",
         "no-data": "Nessun dato di previsione disponibile",
         "starting-bucket": "Secchio iniziale"

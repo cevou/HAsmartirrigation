@@ -206,7 +206,7 @@
         "view-bucket-forecast": "Voorraadprognose bekijken"
       },
       "bucket-forecast": {
-        "title": "5-daagse voorraadprognose",
+        "title": "Voorraadprognose",
         "weather-service-note": "Alleen gebaseerd op prognosedata van de weerdienst, niet op de geconfigureerde sensorgroep",
         "no-data": "Geen prognosedata beschikbaar",
         "starting-bucket": "Startvoorraad"

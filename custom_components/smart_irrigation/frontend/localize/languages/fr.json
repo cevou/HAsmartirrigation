@@ -208,7 +208,7 @@
         "view-bucket-forecast": "Voir la prévision du seau (bucket)"
       },
       "bucket-forecast": {
-        "title": "Prévision du seau (bucket) sur 5 jours",
+        "title": "Prévision du seau (bucket)",
         "weather-service-note": "Basé uniquement sur les données de prévision du service météo — pas sur le groupe de capteurs configuré",
         "no-data": "Aucune donnée de prévision disponible",
         "starting-bucket": "Seau (bucket) initial"

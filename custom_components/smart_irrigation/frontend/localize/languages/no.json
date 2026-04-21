@@ -191,7 +191,7 @@
         "view-bucket-forecast": "Vis bøtteprognose"
       },
       "bucket-forecast": {
-        "title": "5-dagers bøtteprognose",
+        "title": "Bøtteprognose",
         "weather-service-note": "Basert kun på prognosedata fra værtjenesten — ikke på den konfigurerte sensorguppen",
         "no-data": "Ingen prognosedata tilgjengelig",
         "starting-bucket": "Startbøtte"

@@ -207,7 +207,7 @@
         "view-bucket-forecast": "Vorratsprognose anzeigen"
       },
       "bucket-forecast": {
-        "title": "5-Tage-Vorratsprognose",
+        "title": "Vorratsprognose",
         "weather-service-note": "Basiert nur auf Wetterdienst-Prognosedaten, nicht auf der konfigurierten Sensorgruppe",
         "no-data": "Keine Prognosedaten verfügbar",
         "starting-bucket": "Startvorrat"
