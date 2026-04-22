@@ -49,14 +49,24 @@ export class ConfirmationDialog extends LitElement {
         </div>
         <div class="wrapper">${this._params.message || ""}</div>
 
-        <div slot="footer">
-          <mwc-button @click=${this.cancelAction} dialogAction="cancel">
+        <ha-dialog-footer slot="footer">
+          <ha-button
+            slot="secondaryAction"
+            appearance="plain"
+            @click=${this.cancelAction}
+            dialogAction="cancel"
+          >
             ${this.hass.localize("dialogs.generic.cancel")}
-          </mwc-button>
-          <mwc-button @click=${this.confirmAction} dialogAction="close">
+          </ha-button>
+          <ha-button
+            slot="primaryAction"
+            appearance="accent"
+            @click=${this.confirmAction}
+            dialogAction="close"
+          >
             ${this.hass.localize("dialogs.generic.ok")}
-          </mwc-button>
-        </div>
+          </ha-button>
+        </ha-dialog-footer>
       </ha-dialog>
     `;
   }

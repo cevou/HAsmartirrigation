@@ -5774,19 +5774,32 @@
               ` : ""}
         </div>
 
-        <div slot="footer">
-          <mwc-button @click=${this._closeDialog}>
+        <ha-dialog-footer slot="footer">
+          <ha-button
+            slot="secondaryAction"
+            appearance="plain"
+            @click=${this._closeDialog}
+          >
             ${Dn("irrigation_start_triggers.dialog.cancel", this.hass.language)}
-          </mwc-button>
+          </ha-button>
           ${a ? "" : Y`
-                <mwc-button @click=${this._deleteTrigger} class="warning">
+                <ha-button
+                  slot="secondaryAction"
+                  appearance="plain"
+                  variant="danger"
+                  @click=${this._deleteTrigger}
+                >
                   ${Dn("irrigation_start_triggers.dialog.delete", this.hass.language)}
-                </mwc-button>
+                </ha-button>
               `}
-          <mwc-button @click=${this._saveTrigger}>
+          <ha-button
+            slot="primaryAction"
+            appearance="accent"
+            @click=${this._saveTrigger}
+          >
             ${Dn("irrigation_start_triggers.dialog.save", this.hass.language)}
-          </mwc-button>
-        </div>
+          </ha-button>
+        </ha-dialog-footer>
       </ha-dialog>
     `;
     }
@@ -11500,11 +11513,16 @@
         </div>
         <div class="wrapper">${this._params.error || ""}</div>
 
-        <div slot="footer">
-          <mwc-button @click=${this.closeDialog} dialogAction="close">
+        <ha-dialog-footer slot="footer">
+          <ha-button
+            slot="primaryAction"
+            appearance="accent"
+            @click=${this.closeDialog}
+            dialogAction="close"
+          >
             ${this.hass.localize("ui.dialogs.generic.ok")}
-          </mwc-button>
-        </div>
+          </ha-button>
+        </ha-dialog-footer>
       </ha-dialog>
     ` : Y``;
     }
