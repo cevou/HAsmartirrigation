@@ -41,14 +41,11 @@ export class ErrorDialog extends LitElement {
         </div>
         <div class="wrapper">${this._params.error || ""}</div>
 
-        <mwc-button
-          slot="primaryAction"
-          style="float: left"
-          @click=${this.closeDialog}
-          dialogAction="close"
-        >
-          ${this.hass.localize("ui.dialogs.generic.ok")}
-        </mwc-button>
+        <div slot="footer">
+          <mwc-button @click=${this.closeDialog} dialogAction="close">
+            ${this.hass.localize("ui.dialogs.generic.ok")}
+          </mwc-button>
+        </div>
       </ha-dialog>
     `;
   }

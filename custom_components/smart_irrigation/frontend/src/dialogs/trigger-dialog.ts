@@ -338,16 +338,7 @@ export class TriggerDialog extends LitElement {
             : ""}
         </div>
 
-        <div slot="primaryAction">
-          <mwc-button @click=${this._saveTrigger}>
-            ${localize(
-              "irrigation_start_triggers.dialog.save",
-              this.hass.language,
-            )}
-          </mwc-button>
-        </div>
-
-        <div slot="secondaryAction">
+        <div slot="footer">
           <mwc-button @click=${this._closeDialog}>
             ${localize(
               "irrigation_start_triggers.dialog.cancel",
@@ -364,6 +355,12 @@ export class TriggerDialog extends LitElement {
                 </mwc-button>
               `
             : ""}
+          <mwc-button @click=${this._saveTrigger}>
+            ${localize(
+              "irrigation_start_triggers.dialog.save",
+              this.hass.language,
+            )}
+          </mwc-button>
         </div>
       </ha-dialog>
     `;
