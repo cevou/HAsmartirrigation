@@ -5708,18 +5708,17 @@
             <ha-select
               .label=${Dn("irrigation_start_triggers.fields.type.name", this.hass.language)}
               .value=${this._trigger.type}
-              @value-changed=${this._typeChanged}
-              @change=${this._typeChanged}
+              @selected=${this._typeChanged}
             >
-              <mwc-list-item value=${Ee}>
+              <ha-dropdown-item value=${Ee}>
                 ${Dn("irrigation_start_triggers.trigger_types.sunrise", this.hass.language)}
-              </mwc-list-item>
-              <mwc-list-item value=${"sunset"}>
+              </ha-dropdown-item>
+              <ha-dropdown-item value=${"sunset"}>
                 ${Dn("irrigation_start_triggers.trigger_types.sunset", this.hass.language)}
-              </mwc-list-item>
-              <mwc-list-item value=${Te}>
+              </ha-dropdown-item>
+              <ha-dropdown-item value=${Te}>
                 ${Dn("irrigation_start_triggers.trigger_types.solar_azimuth", this.hass.language)}
-              </mwc-list-item>
+              </ha-dropdown-item>
             </ha-select>
           </div>
 
