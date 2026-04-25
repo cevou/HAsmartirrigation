@@ -860,7 +860,7 @@ export class SmartIrrigationViewGeneral extends SubscribeMixin(LitElement) {
     // Clean up when dialog closes
     dialog.addEventListener("closed", (ev: Event) => {
       // Only react when the closed event originates from the dialog itself.
-      // Ignore "closed" emitted by nested overlays (mwc-menu / ha-select).
+      // Ignore "closed" emitted by nested overlays (ha-select).
       const origin = ev.target as Element | null;
       if (!origin) return;
       if (origin.tagName.toLowerCase() !== "ha-dialog") {
